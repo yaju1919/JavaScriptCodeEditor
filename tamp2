@@ -1,0 +1,304 @@
+// ==UserScript==
+// @name         feederチャット - コンソール
+// @author       You
+// @namespace    https://www.x-feeder.info/
+// @version      1.919810931
+// @description  コンソールを開かなくてもJavaScriptが直接入力できます。
+// @icon         https://www1.x-feeder.info/____/pictures/PIC_PmK1jE.png
+// @match        https://jquery.com/
+// @match        *.x-feeder.info/*/
+// @match        *.x-feeder.info/*/sp/
+// @exclude      *.x-feeder.info/*/settings/**
+// @grant        GM.setValue
+// @grant        GM.getValue
+// @require      https://cdnjs.cloudflare.com/ajax/libs/js-beautify/1.10.0/beautify.js
+// @require      https://cdn.rawgit.com/google/code-prettify/master/loader/run_prettify.js
+// ==/UserScript==
+(function () {
+    'use strict';
+    const FONT_COLOR = "lightgreen";
+    const BACK_COLOR = "black";
+    const PrependToPlace = (()=>{
+        //return $("body");/////////////////////////////////////////////
+        const PC = $("#wrapper");
+        if(PC.get(0)) return PC;
+        return $("#home");
+    })();
+    const holder = $("<div>").prependTo(PrependToPlace).css({
+        padding : "1em",
+        backgroundColor:BACK_COLOR,
+        color:FONT_COLOR
+    });
+    holder.append("feederチャット - コンソール<br>");
+    let line_counter = 0;
+    const appendResult = (text, {back, font, symbol}) => {
+        if(!text) return;
+        line_counter++;
+        $("<div>").appendTo(result)
+            .css({
+            backgroundColor: back,
+            color: font
+        })
+            .append($("<span>").text('　' + (symbol || line_counter) + '　-　'))
+            .append(text)
+        result.scrollTop(result.get(0).scrollHeight);
+    };
+    const clearResult = () => {
+        line_counter = 0;
+        result.empty();
+    };
+    const Run = () => {
+        Reset_console_info();
+        clearResult();
+        const v = input.val();
+        try {
+            console.log(eval(v));
+        }
+        catch (e) {
+            console.error(e);
+        }
+    };
+    const appendButton = (name, func) => holder.append($("<button>").text(name).click(func)).append("　");
+    const appendCheckbox = (name, flag) => {
+        const checkbox = $("<input>").attr("type","checkbox").prop("checked",flag);
+        const div = $("<span>").appendTo(holder).append(checkbox).append(name).append("　");
+        return () => checkbox.get(0).checked;
+    };
+    const appendSelect = () => {
+        const select = $("<select>").appendTo(holder);
+        const add = (name, value) => $("<option>").appendTo(select).text(name).val(value);
+        const val = () => select.val();
+        return {add, val};
+    };
+    appendButton("コードを実行", Run);
+    appendButton("クリア", clearResult);
+    const flag_AutoShapingCode = appendCheckbox("自動コード整形", true);
+    const AutoShapingCode = () => {
+        const location_sign = "/*\0\0\0*/";
+        const v = input.val();
+        if(!flag_AutoShapingCode()) return;
+        const end = input.get(0).selectionEnd;
+        const result = js_beautify(insertStr(v, end, location_sign),{max_preserve_newlines:2});
+        const location = result.indexOf(location_sign);
+        input.val(result.replace(location_sign, ""))
+        .focus().get(0).setSelectionRange(location, location);
+    };
+    let save_storage;
+    const PropertyNAME_SAVE_CODE = "PropertyNAME_SAVE_CODE";
+    const Save = () => {
+        if(flag_SafeMode() && save_storage && input.val())if(!confirm("一時保存されているコードを上書きしますか？")) return;
+        clearResult();
+        const v = input.val();
+        if(!v) return console.error("コードの上書き保存に失敗しました。");
+        save_storage = v;
+        GM.setValue(PropertyNAME_SAVE_CODE, v);
+        console.log("コードを上書き保存しました。")
+    };
+    appendButton("一時保存", Save);
+    GM.getValue(PropertyNAME_SAVE_CODE, null).then(data => {
+        save_storage = data;
+    });
+    const Read = () => {
+        if(flag_SafeMode() && input.val())if(!confirm("現在のコードを上書きしますか？")) return;
+        clearResult();
+        if(save_storage) {
+            input.val(save_storage);
+            adjust();
+            console.log("コードを正常に読み込みました。");
+        }
+        else console.error("保存されているコードがありません。");
+    };
+    appendButton("読み込む", Read);
+    const flag_SafeMode = appendCheckbox("セーフモード", true);
+    const select_Implemented = appendSelect();
+    select_Implemented.add("実装済みconsole関数", null);
+    const insertStr = (str, idx, val) => str.slice(0, idx) + val + str.slice(idx);
+    const insertToInput = text => {
+        if(!text) return;
+        const end = input.get(0).selectionEnd;
+        input.val(insertStr(input.val(), end, text))
+            .focus().get(0).setSelectionRange(end + text.length, end + text.length);
+        adjust();
+    };
+    appendButton("コピペ", () => insertToInput(select_Implemented.val()));
+    appendButton("上に移動", () => input.stop().animate({scrollTop:input.scrollTop()-input.height()}));
+    appendButton("下に移動", () => input.stop().animate({scrollTop:input.scrollTop()+input.height()}));
+    const edit_log = [];
+    let edit_now_index = 0;
+    appendButton("元に戻す", () => {
+        if(edit_now_index <= 0) return;
+        input.val(edit_log[--edit_now_index]);
+    });
+    appendButton("やり直し", () => {
+        if(edit_log.length - 1 <= edit_now_index) return;
+        input.val(edit_log[++edit_now_index]);
+    });
+    appendButton("すべて選択", () => input.select());
+    (()=>{
+        if(!navigator.clipboard) return;
+        if(!navigator.clipboard.readText) return;
+        appendButton("貼り付け", () => navigator.clipboard.readText().then(text=>insertToInput(text)));
+    })();
+    const setCSSpre = () => {
+        const color = {
+            str: "#EC7600",
+            kwd: "#93C763",
+            com: "#66747B",
+            typ: "#678CB1",
+            lit: "#FACD22",
+            pun: "#F1F2F3",
+            pln: "#F1F2F3",
+            tag: "#8AC763",
+            atn: "#E0E2E4",
+            atv: "#EC7600",
+            dec: "purple",
+        };
+        for(const key in color) pre.find("."+key).css({color:color[key]});
+        pre.find(".prettyprint").css({border: "0px solid #888", background: "#000"});
+        pre.find(".linenums").css({marginTop: 0, marginBottom: 0});
+        pre.find("li").each((i,e)=>{
+            const jq = $(e).css({color: "#555","list-style-type": "decimal"});
+            if(!Number(jq.attr("class")[1])%2) return;
+            jq.css({background: "#111"});
+        });
+    };
+    const pre = $('<pre>').appendTo(holder).width(holder.width()).attr("contentEditable",true)
+    .css({
+        boxSizing : 'border-box',
+        "max-height": $(window).height()/2,
+        "overflow-y": "scroll",
+        padding : "1em",
+    });
+    const input = $('<textarea>').appendTo(holder).width(holder.width()).css({
+        boxSizing : 'border-box',
+        "max-height": $(window).height()/2,
+        "overflow-y": "scroll",
+        //padding : "1em",
+    })
+    .keydown((()=>{
+        let counter = 0;
+        return () => {
+            if((++counter) % 10) return;
+            edit_log[edit_now_index++] = input.val();
+        }
+    })())
+    .attr('placeholder', "ここにコードを入力（Ctrl + F5で実行）\nCtrl + S : 一時保存\nCtrl + R : 読み込む")
+    .keydown(e=>{
+        switch(e.key){
+            case 'F5':
+                if(e.ctrlKey){
+                    e.preventDefault();
+                    Run();
+                }
+                break;
+            case 's':
+            case 'S':
+                if(e.ctrlKey){
+                    e.preventDefault();
+                    Save();
+                }
+                break;
+            case 'r':
+            case 'R':
+                if(e.ctrlKey){
+                    e.preventDefault();
+                    Read();
+                }
+                break;
+        };
+    });
+    const get1em = () => {
+        const d = $("<div>").appendTo($("body")).height("1em");
+        const h = d.height();
+        d.remove();
+        return h;
+    };
+    const adjust = () => {
+        AutoShapingCode();
+        input.height( input.val().split('\n').length + 2 + "em" );
+        const end = input.get(0).selectionEnd;
+        const length = input.val().slice(0, end).split('\n').length-1;
+        input.scrollTop(length*get1em());
+        pre.attr("class","prettyprint linenums lang-js").text(input.val());
+        PR.prettyPrint();
+        setCSSpre();
+    };
+    adjust();
+    input.keyup(e => {
+        if(e.key === "Enter") adjust();
+    });
+    const result = $("<div>").appendTo(holder).css({
+        "max-height": $(window).height()/2,
+        "overflow-y": "scroll",
+        padding : "1em",
+    });
+    const toStr = a => {
+        const type = Object.prototype.toString.call(a).replace(/\[object |\]/g,"");
+        switch(type){
+            case "String": return '"' + a + '"';
+            case "Function": return a.toString();
+            case "Array": return '[' + a.toString() + ']';
+            case "Object":
+                {
+                    const array = [];
+                    for(const key in a) array.push( key + ": " + a[key]);
+                    return "{" + array.join() + "}";
+                }
+            case "Null": return "null";
+            case "Undefined": return "undefined";
+            default: return String(a);
+        }
+    };
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    const tamperConsole = (key, func) => {
+        const console_name = "console." + key;
+        select_Implemented.add(console_name, console_name + '("Hello, World!");');
+        const copy = console[key];
+        console[key] = function () {
+            if(copy) copy(...arguments);
+            func(...arguments);
+        };
+    };
+    const tamperConsoleLog = (key, option) => {
+        tamperConsole(key, function () {
+            const array = [];
+            for(const a of arguments) array.push(toStr(a));
+            appendResult(array.join(" "), option);
+        });
+    };
+    tamperConsoleLog("log", {back:BACK_COLOR, font:FONT_COLOR, symbol:null});
+    tamperConsoleLog("error", {back:"pink", font:"red", symbol:"×"});
+    tamperConsoleLog("warn", {back:"lightyellow", font:"orange", symbol:"▲"});
+    tamperConsoleLog("info", {back:"lightblue", font:"blue", symbol:"●"});
+    const console_info = {
+        count: {},
+        time: {}
+    };
+    const Reset_console_info = () => {
+        for(const key in console_info) console_info[key] = {};
+    };
+    tamperConsole("count", label => {
+        if(!label) label = "default";
+        if(!console_info.count[label]) console_info.count[label] = 0;
+        appendResult(label + ': ' + (++console_info.count[label]), {back:BACK_COLOR, font:"lightblue", symbol:null});
+    });
+    tamperConsole("time", label => {
+        if(!label) label = "default";
+        if(!console_info.time[label] && console_info.time[label] !== 0) console_info.time[label] = new Date().getTime();
+        else console.warn("Timer '" + label + "' already exists");
+    });
+    tamperConsole("timeEnd", label => {
+        if(!label) label = "default";
+        if(console_info.time[label] || console_info.time[label] === 0) {
+            const sub = new Date().getTime() - console_info.time[label];
+            appendResult(label + ': ' + sub + 'ms', {back:BACK_COLOR, font:"lightblue", symbol:null});
+            console_info.time[label] = null;
+        }
+        else console.warn("Timer '" + label + "' does not exist");
+    });
+    ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    holder.children().css({
+        backgroundColor: BACK_COLOR,
+        color: FONT_COLOR
+    });
+})();

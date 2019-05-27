@@ -72,8 +72,10 @@
     appendButton("クリア", clearResult);
     const flag_AutoShapingCode = appendCheckbox("自動コード整形", true);
     const AutoShapingCode = () => {
+        const now_sign = "ghghjaladjofpjefopjfofjkldjdfjeoijffiojdkjdoifejiofjfiojihfjjjef";
         const v = input.val();
         const end = input.get(0).selectionEnd;
+        insertToInput(now_sign)
         if(!flag_AutoShapingCode() || /\s/.test(v.slice(-1))) return;
         input.val(js_beautify(input.val()));
         const sub = input.val().length - v.length;

@@ -1,5 +1,5 @@
 // ==UserScript==
-// @name         feederチャット - コンソール
+// @name         コンソール
 // @author       You
 // @namespace    https://www.x-feeder.info/
 // @version      1.919
@@ -28,7 +28,7 @@
         backgroundColor:BACK_COLOR,
         color:FONT_COLOR
     });
-    holder.append("feederチャット - コンソール<br>");
+    holder.append("コンソール<br>");
     let line_counter = 0;
     const appendResult = (text, {back, font, symbol}) => {
         if(!text) return;
@@ -40,6 +40,7 @@
         })
             .append($("<span>").text('　' + (symbol || line_counter) + '　-　'))
             .append(text)
+        result.scrollTop(result.get(0).scrollHeight);
     };
     const clearResult = () => {
         line_counter = 0;
@@ -72,14 +73,17 @@
     appendButton("クリア", clearResult);
     const flag_AutoShapingCode = appendCheckbox("自動コード整形", true);
     const AutoShapingCode = () => {
-        const now_sign = "ghghjaladjofpjefopjfofjkldjdfjeoijffiojdkjdoifejiofjfiojihfjjjef";
+        const log = input.scrollTop();
+        const location_sign = "/*\0\0\0*/";
         const v = input.val();
+        if(!flag_AutoShapingCode()) return;
         const end = input.get(0).selectionEnd;
-        insertToInput(now_sign)
-        if(!flag_AutoShapingCode() || /\s/.test(v.slice(-1))) return;
-        input.val(js_beautify(input.val()));
-        const sub = input.val().length - v.length;
-        input.focus().get(0).setSelectionRange(end + sub, end + sub);
+        if(end === v.length || /[^\s\n]/.test(v.slice(end - 1, end))) return;
+        const result = js_beautify(insertStr(v, end, location_sign),{max_preserve_newlines:2});
+        const location = result.indexOf(location_sign);
+        input.val(result.replace(location_sign, "").trim())
+        .focus().get(0).setSelectionRange(location, location);
+        input.scrollTop(log + input.height()/2);
     };
     let save_storage;
     const PropertyNAME_SAVE_CODE = "PropertyNAME_SAVE_CODE";
@@ -110,16 +114,15 @@
     const flag_SafeMode = appendCheckbox("セーフモード", true);
     const select_Implemented = appendSelect();
     select_Implemented.add("実装済みconsole関数", null);
+    const insertStr = (str, idx, val) => str.slice(0, idx) + val + str.slice(idx);
     const insertToInput = text => {
         if(!text) return;
         const log = input.scrollTop();
-        const e = input.get(0);
-        const start = e.selectionStart;
-        const end = e.selectionEnd;
-        const str = input.val();
-        input.val(str.slice(0, start) + text + str.slice(end)).focus().get(0).setSelectionRange(start, end + text.length);
+        const end = input.get(0).selectionEnd;
+        input.val(insertStr(input.val(), end, text))
+            .focus().get(0).setSelectionRange(end + text.length, end + text.length);
         adjust();
-        input.scrollTop(log);
+        input.scrollTop(log + input.height()/2);
     };
     appendButton("コピペ", () => insertToInput(select_Implemented.val()));
     appendButton("上に移動", () => input.stop().animate({scrollTop:input.scrollTop()-input.height()}));
@@ -135,7 +138,11 @@
         input.val(edit_log[++edit_now_index]);
     });
     appendButton("すべて選択", () => input.select());
-    if(navigator.clipboard) if(navigator.clipboard.readText) appendButton("貼り付け", () => navigator.clipboard.readText().then(text=>insertToInput(text)));
+    (()=>{
+        if(!navigator.clipboard) return;
+        if(!navigator.clipboard.readText) return;
+        appendButton("貼り付け", () => navigator.clipboard.readText().then(text=>insertToInput(text)));
+    })();
     const input = $('<textarea>').appendTo(holder).width(holder.width()).css({
         boxSizing : 'border-box',
         "max-height": $(window).height()/2,

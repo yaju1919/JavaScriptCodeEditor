@@ -70,7 +70,7 @@
     });
     $("textarea").css({
         width: "90%",
-        height: "50%",
+        height: $(window).height()/2,
         padding : "1em",
         boxSizing : 'border-box',
         "overflow-y": "scroll",
@@ -82,7 +82,7 @@
     var result_js = $("<div>").appendTo(h_js);
     $([result_html, result_js]).css({
         width: "90%",
-        height: "50%",
+        "max-height": $(window).height()/2,
         padding : "1em",
         boxSizing : 'border-box',
         "overflow-y": "scroll",

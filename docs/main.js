@@ -51,9 +51,10 @@
         }
     })();
     //-------------------------------------------------------------------------------
-    var h = $("<div>",{text: "仮想console"}).appendTo($("body")).css({
+    var h = $("<div>").appendTo($("body")).css({
         padding : "1em",
     });
+    $("<h1>",{text:"仮想console"}).appendTo(h);
     var h_html = $("<div>").appendTo(h).css({float: "left"});
     var h_js = $("<div>").appendTo(h).css({float: "right"});
     //-------------------------------------------------------
@@ -64,8 +65,8 @@
     var shapeCode = function(){};
     var input_js = $("<textarea>",{}).appendTo(h_js).keyup(shapeCode);
     $("textarea").css({
-        width: "40%",
-        height: "40%",
+        width: "90%",
+        height: "50%",
         padding : "1em",
         boxSizing : 'border-box',
         "overflow-y": "scroll",
@@ -76,8 +77,8 @@
     var result_html = $("<div>").appendTo(h_html);
     var result_js = $("<div>").appendTo(h_js);
     $([result_html, result_js]).css({
-        width: "40%",
-        height: "40%",
+        width: "90%",
+        height: "50%",
         padding : "1em",
         boxSizing : 'border-box',
         "overflow-y": "scroll",
@@ -127,7 +128,8 @@
         js: input_js,
         html: input_html
     }
-    ['js','html'].forEach(v=>{
+    var array = ['js','html'];
+    array.forEach(function(v){
         appendBtn(ui[v], "上に移動", () => input[v].stop().animate({scrollTop:input[v].scrollTop()-input[v].height()}));
         appendBtn(ui[v], "下に移動", () => input[v].stop().animate({scrollTop:input[v].scrollTop()+input[v].height()}));
     });

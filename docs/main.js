@@ -44,10 +44,12 @@
         for(var k in list){
             origin[k] = window.console[k];
             var ar = list[k];
-            window.console[k] = function(back = ar[0], font = ar[1], symbol = ar[2]){
-                origin[k](arguments);
-                appendResult(Array.prototype.join.call(arguments), back, font, symbol);
-            }
+            window.console[k] = (function(key = k, back = ar[0], font = ar[1], symbol = ar[2]){
+                return function(){
+                    origin[key](arguments);
+                    appendResult(Array.prototype.join.call(arguments), back, font, symbol);
+                }
+            })();
         }
     })();
     //-------------------------------------------------------------------------------

@@ -44,7 +44,7 @@
         for(var k in list){
             origin[k] = window.console[k];
             var ar = list[k];
-            window.console[k] = (function(key = k, back = ar[0], font = ar[1], symbol = ar[2]){
+            window.console[k] = (function({key = k, back = ar[0], font = ar[1], symbol = ar[2]}={}){
                 return function(){
                     origin[key](arguments);
                     var str = "";

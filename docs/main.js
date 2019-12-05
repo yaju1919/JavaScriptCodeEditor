@@ -47,6 +47,8 @@
                 origin[k](arguments);
                 var str = '';
                 for(var i = 0; i < arguments.length; i++) str += arguments[i];
+                var ar = list[k];
+                appendResult(str, ar[0], ar[1], ar[2]);
             }
         }
     })();
@@ -55,15 +57,15 @@
         padding : "1em",
     });
     $("<h1>",{text:"仮想console"}).appendTo(h);
-    var h_html = $("<div>").appendTo(h).css({float: "left"});
-    var h_js = $("<div>").appendTo(h).css({float: "right"});
+    var h_html = $("<div>").appendTo(h).css({float: "left", width: "50%"});
+    var h_js = $("<div>").appendTo(h).css({float: "right", width: "50%"});
     //-------------------------------------------------------
     var ui_html = $("<div>").appendTo(h_html);
     var ui_js = $("<div>").appendTo(h_js);
     //-------------------------------------------------------
-    var input_html = $("<textarea>",{}).appendTo(h_html);
+    var input_html = $("<textarea>",{placeholder: "HTMLを入力"}).appendTo(h_html);
     var shapeCode = function(){};
-    var input_js = $("<textarea>",{}).appendTo(h_js).keyup(shapeCode);
+    var input_js = $("<textarea>",{placeholder: "JavaScriptを入力"}).appendTo(h_js).keydown(shapeCode);
     $("textarea").css({
         width: "90%",
         height: "50%",
@@ -97,7 +99,7 @@
             check.prop("checked",flag);
             if(change && isClick) change(flag);
         };
-        const btn = $("<button>").appendTo(h)
+        var btn = $("<button>").appendTo(h)
         .append(check).append(title).click(function(){
             set(!flag);
         });
@@ -130,8 +132,8 @@
     }
     var array = ['js','html'];
     array.forEach(function(v){
-        appendBtn(ui[v], "上に移動", () => input[v].stop().animate({scrollTop:input[v].scrollTop()-input[v].height()}));
-        appendBtn(ui[v], "下に移動", () => input[v].stop().animate({scrollTop:input[v].scrollTop()+input[v].height()}));
+        appendBtn(ui[v], "上に移動", function(){ input[v].stop().animate({scrollTop:input[v].scrollTop()-input[v].height()}) });
+        appendBtn(ui[v], "下に移動", function(){ input[v].stop().animate({scrollTop:input[v].scrollTop()+input[v].height()}) });
     });
     appendBtn(ui_js, "実行", run);
     appendBtn(ui_js, "クリア", clear_console);
@@ -144,8 +146,7 @@
     });
     shapeCode = function () {
         if(!flag_AutoShapeCode()) return;
-        const end = input.get(0).selectionEnd;
-        const result = js_beautify(input_js.val(),{max_preserve_newlines:2});
+        var result = js_beautify(input_js.val(),{max_preserve_newlines:2});
         input_js.val(result).focus().get(0);
     }
     var flag_AutoShapeCode = appendCheckBox(ui_js, "自動コード整形", false, shapeCode);

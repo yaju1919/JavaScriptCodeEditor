@@ -47,7 +47,13 @@
             window.console[k] = (function(key = k, back = ar[0], font = ar[1], symbol = ar[2]){
                 return function(){
                     origin[key](arguments);
-                    appendResult(Array.prototype.join.call(arguments), back, font, symbol);
+                    var str = "";
+                    if(arguments.length === 1) {
+                        var type = Object.prototype.toString.call(arguments[0]);
+                        if(["Number", "String", "Array"].indexOf(type.replace(/\[object |\]/g,"")) === -1) str = type;
+                    }
+                    if(!str) str = Array.prototype.join.call(arguments);
+                    appendResult(str, back, font, symbol);
                 }
             })();
         }
@@ -56,7 +62,7 @@
     var h = $("<div>").appendTo($("body")).css({
         padding : "1em",
     });
-    $("<h1>",{text:"仮想console"}).appendTo(h);
+    $("<h1>",{text:"HTML & JavaScript エディタ"}).appendTo(h);
     var h_html = $("<div>").appendTo(h).css({float: "left", width: "50%"});
     var h_js = $("<div>").appendTo(h).css({float: "right", width: "50%"});
     //-------------------------------------------------------
@@ -65,7 +71,7 @@
     //-------------------------------------------------------
     var input_html = $("<textarea>",{placeholder: "HTMLを入力"}).appendTo(h_html);
     var shapeCode = function(){};
-    var input_js = $("<textarea>",{placeholder: "JavaScriptを入力"}).appendTo(h_js).keydown(function(e){
+    var input_js = $("<textarea>",{placeholder: "JavaScriptを入力"}).appendTo(h_js).keyup(function(e){
         if(['}',']',';','Enter'].indexOf(e.key) !== -1) shapeCode();
     });
     $("textarea").css({

@@ -73,7 +73,7 @@
     var input_html = $("<textarea>",{placeholder: "HTMLを入力"}).appendTo(h_html);
     var shapeCode = function(){};
     var input_js = $("<textarea>",{placeholder: "JavaScriptを入力"}).appendTo(h_js).keyup(function(e){
-        if(['}',']',';','Enter'].indexOf(e.key) !== -1) shapeCode();
+        if(['}',']',';'].indexOf(e.key) !== -1) shapeCode();
     });
     $("textarea").css({
         width: "90%",

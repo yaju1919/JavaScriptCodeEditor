@@ -31,7 +31,7 @@
                 backgroundColor: back,
                 color: font
             })
-                .text('　' + (symbol || g_line_counter) + '　-　' + text)
+                .text('　' + (symbol || g_line_counter++) + '　-　' + text)
             result_js.scrollTop(result_js.get(0).scrollHeight);
         }
         var list = { // [ back-color, font-color, symbol, func ]
@@ -70,7 +70,7 @@
     });
     $("textarea").css({
         width: "90%",
-        height: $(window).height()/2,
+        height: $(window).height()/3,
         padding : "1em",
         boxSizing : 'border-box',
         "overflow-y": "scroll",
@@ -80,9 +80,9 @@
     //-------------------------------------------------------
     var result_html = $("<div>").appendTo(h_html);
     var result_js = $("<div>").appendTo(h_js);
-    $([result_html, result_js]).css({
+    result_html.add(result_js).css({
         width: "90%",
-        "max-height": $(window).height()/2,
+        "max-height": $(window).height()/3,
         padding : "1em",
         boxSizing : 'border-box',
         "overflow-y": "scroll",

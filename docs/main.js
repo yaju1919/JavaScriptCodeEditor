@@ -44,9 +44,9 @@
         for(var k in list){
             origin[k] = window.console[k];
             var ar = list[k];
-            window.console[k] = function(){
+            window.console[k] = function(back = ar[0], font = ar[1], symbol = ar[2]){
                 origin[k](arguments);
-                appendResult(Array.prototype.join.call(arguments), ar[0], ar[1], ar[2]);
+                appendResult(Array.prototype.join.call(arguments), back, font, symbol);
             }
         }
     })();
@@ -64,7 +64,7 @@
     var input_html = $("<textarea>",{placeholder: "HTMLを入力"}).appendTo(h_html);
     var shapeCode = function(){};
     var input_js = $("<textarea>",{placeholder: "JavaScriptを入力"}).appendTo(h_js).keydown(function(e){
-        if(['=','}',']',';','Enter'].indexOf(e.key) !== -1) shapeCode();
+        if(['}',']',';','Enter'].indexOf(e.key) !== -1) shapeCode();
     });
     $("textarea").css({
         width: "90%",

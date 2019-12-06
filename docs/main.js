@@ -30,9 +30,7 @@
                 .css({
                 backgroundColor: back,
                 color: font
-            })
-                .text('　' + (symbol || g_line_counter++) + '　-　' + text)
-            result_js.scrollTop(result_js.get(0).scrollHeight);
+            }).text('　' + (symbol || g_line_counter++) + '　-　' + text);
         }
         var list = { // [ back-color, font-color, symbol, func ]
             log: [ "white", "black", "" ],

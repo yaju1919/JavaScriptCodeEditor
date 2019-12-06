@@ -51,7 +51,7 @@
                     var str = "";
                     if(arguments.length === 1) {
                         var type = Object.prototype.toString.call(arguments[0]);
-                        if(["Number", "String", "Array", "Error"].indexOf(type.replace(/\[object |\]/g,"")) === -1) str = type;
+                        if(["Number", "String", "Array", "Boolean", "Error"].indexOf(type.replace(/\[object |\]/g,"")) === -1) str = type;
                     }
                     if(!str) str = Array.prototype.join.call(arguments);
                     appendResult(str, back, font, symbol);

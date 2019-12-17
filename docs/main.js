@@ -39,6 +39,10 @@
     //---------------------------------------------------------------------------------
     var h = $("<center>").appendTo($("body"));
     var query = {}; // title = "タイトル", text = "コンテンツ", background = "背景"
+    location.search.slice(1).split('&').map(function(v){
+        var ar = v.split('=');
+        query[ar[0]] = decode(ar[1]);
+    });
     var reg_URL = new RegExp(
         '^(https?:\\/\\/)?'+ // protocol
         '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
@@ -48,12 +52,8 @@
         '(\\#[-a-z\\d_]*)?$','gi'
     ); // fragment locator
     //---------------------------------------------------------------------------------
-    (location.search.length ? view_mode : edit_mode)();
+    (Object.keys(query).length === 0 || query.ver ? edit_mode : view_mode)();
     function view_mode(){ // 閲覧モード
-        location.search.slice(1).split('&').map(function(v){
-            var ar = v.split('=');
-            query[ar[0]] = decode(ar[1]);
-        });
         $("body").css({
             "background-color": query.color,
             "background-image": "url(" + query.img + ")",

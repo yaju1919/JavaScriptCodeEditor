@@ -1,117 +1,161 @@
-(function() {
+(function () {
     'use strict';
-    function baseN(base){ // N進数を作成するクラス
-        var len = base.length, reg = /^0+/;
-        this.encode = function(num){ // 10進数をN進数に変換
-            if(isNaN(num)) return NaN;
-            var str = "", v = num;
-            while(v !== 0){
-                v = parseInt(v);
-                str = base[v % len] + str;
-                v /= len;
-            }
-            return str.replace(reg,"");
+    var FONT_COLOR = "lightgreen";
+    var BACK_COLOR = "black";
+    //-------------------------------------------------------------------------------
+    var clearAll_Interval;
+    (function () { // setTimeout & setInterval
+        var setTimeout_copy = window.setInterval;
+        var setInterval_copy = window.setInterval;
+        var set_IDs = [];
+        clearAll_Interval = function () { // 時間差関数を消去
+            while(set_IDs.length) clearInterval(set_IDs.pop());
         }
-        this.decode = function(str){ // N進数を10進数に変換
-            return String(str).replace(reg,"").split("").reverse().map(function(v,i){
-                return base.indexOf(v) * (len ** i);
-            }).reduce(function(total, v){
-                return total + v;
-            });
+        window.setTimeout = function (func, delay, param1, param2, param3) { // clearInterval
+            var id = setTimeout_copy(func, delay, param1, param2, param3);
+            set_IDs.push(id);
+            return id;
         }
-    }
-    var to64 = new baseN([
-        '0123456789',
-        'abcdefghijklmnopqrstuvwxyz',
-        'ABCDEFGHIJKLMNOPQRSTUVWXYZ',
-        '-_'
-    ].join(''));
-    function encode(str){
-        return str.split('').map(function(v){
-            return ("000"+to64.encode(v.charCodeAt(0)).slice(-3));
-        }).join('');
-    }
-    function decode(str){
-        return str.replace(/.{3}/g, function(n){
-            return String.fromCharCode(to64.decode(n));
-        });
-    }
-    //---------------------------------------------------------------------------------
-    var h = $("<center>").appendTo($("body"));
-    var query = {}; // title = "タイトル", text = "コンテンツ", background = "背景"
-    location.search.slice(1).split('&').map(function(v){
-        var ar = v.split('=');
-        query[ar[0]] = decode(ar[1]);
+        window.setInterval = function (func, delay, param1, param2, param3) { // clearInterval
+            var id = setInterval_copy(func, delay, param1, param2, param3);
+            set_IDs.push(id);
+            return id;
+        }
+    })();
+    //-------------------------------------------------------------------------------
+    var g_line_counter = 0; // consoleの行数
+    (function () {
+        function appendResult (text, back, font, symbol) {
+            $("<pre>").appendTo(result_js)
+                .css({
+                backgroundColor: back,
+                color: font
+            }).text('　' + (symbol || g_line_counter++) + '　-　' + text);
+        }
+        var list = { // [ back-color, font-color, symbol, func ]
+            log: [ "white", "black", "" ],
+            error: [ "pink", "red", "×" ],
+            warn: [ "lightyellow", "orange", "▲" ],
+            info: [ "lightblue", "blue", "●" ],
+        }
+        var origin = {};
+        for(var k in list){
+            origin[k] = window.console[k];
+            var ar = list[k];
+            window.console[k] = (function(){
+                var key = k, back = ar[0], font = ar[1], symbol = ar[2];
+                return function(){
+                    origin[key](arguments);
+                    var str = "";
+                    if(arguments.length === 1) {
+                        var type = Object.prototype.toString.call(arguments[0]);
+                        if(["Number", "String", "Array", "Boolean", "Error"].indexOf(type.replace(/\[object |\]/g,"")) === -1) str = type;
+                    }
+                    if(!str) str = Array.prototype.join.call(arguments);
+                    appendResult(str, back, font, symbol);
+                }
+            })();
+        }
+    })();
+    //-------------------------------------------------------------------------------
+    var h = $("<div>").appendTo($("body")).css({
+        padding : "1em",
     });
-    var reg_URL = new RegExp(
-        '^(https?:\\/\\/)?'+ // protocol
-        '((([a-z\\d]([a-z\\d-]*[a-z\\d])*)\\.)+[a-z]{2,}|'+ // domain name
-        '((\\d{1,3}\\.){3}\\d{1,3}))'+ // OR ip (v4) address
-        '(\\:\\d+)?(\\/[-a-z\\d%_.~+]*)*'+ // port and path
-        '(\\?[;&a-z\\d%_.~+=-]*)?'+ // query string
-        '(\\#[-a-z\\d_]*)?$','gi'
-    ); // fragment locator
-    //---------------------------------------------------------------------------------
-    (Object.keys(query).length === 0 || query.ver ? edit_mode : view_mode)();
-    function view_mode(){ // 閲覧モード
-        $("body").css({
-            "background-color": query.color,
-            "background-image": "url(" + query.img + ")",
-            "color": query.font
-        });
-        $("<h1>",{text: query.title}).appendTo(h);
-        var MAX = 64;
-        $("<h3>",{text: query.text}).append(query.text.replace(reg_URL, function(url){
-            var url2 = url;
-            if(url.length > MAX) url2 = url.slice(-MAX) + '…';
-            return $("<a>",{text: url2, href: url, target: "_blank"}).prop("outerHTML");
-        })).appendTo(h);
+    $("<h1>",{text:"HTML & JavaScript エディタ"}).appendTo(h);
+    var h_html = $("<div>").appendTo(h).css({float: "left", width: "50%"});
+    var h_js = $("<div>").appendTo(h).css({float: "right", width: "50%"});
+    //-------------------------------------------------------
+    var ui_html = $("<div>").appendTo(h_html);
+    var ui_js = $("<div>").appendTo(h_js);
+    //-------------------------------------------------------
+    var input_html = $("<textarea>",{placeholder: "HTMLを入力"}).appendTo(h_html);
+    var shapeCode = function(){};
+    var input_js = $("<textarea>",{placeholder: "JavaScriptを入力"}).appendTo(h_js).keyup(function(e){
+        if(['}',']',';'].indexOf(e.key) !== -1) shapeCode();
+    });
+    $("textarea").css({
+        width: "90%",
+        height: $(window).height()/3,
+        padding : "1em",
+        boxSizing : 'border-box',
+        "overflow-y": "scroll",
+        backgroundColor: BACK_COLOR,
+        color: FONT_COLOR
+    });
+    //-------------------------------------------------------
+    var result_html = $("<div>").appendTo(h_html);
+    var result_js = $("<div>").appendTo(h_js);
+    result_html.add(result_js).css({
+        width: "90%",
+        "max-height": $(window).height()/3,
+        padding : "1em",
+        boxSizing : 'border-box',
+        "overflow-y": "scroll",
+    });
+    //-------------------------------------------------------------------------------
+    function appendBtn (parent, title, func) {
+        return $("<button>").text(title).click(func).appendTo(parent);
     }
-    //---------------------------------------------------------------------------------
-    function edit_mode(){ // 編集モード
-        $("<h1>",{text: "簡単な文書ページが作成できます。"}).appendTo(h);
-        query.title = addInput("タイトル");
-        query.img = addInput("背景の画像", "画像のurl");
-        query.color = addInput("背景の色", "RGB形式カラーコード");
-        query.font = addInput("文字の色", "RGB形式カラーコード");
-        query.text = addInput("本文", "650字以内で書いてください。", true).keyup((function(){
-            var text = $(this).val();
-            $(this).height((text.split('\n').length + 2) + "em");
-            show_length.text("現在の文字数:"+text.length);
-        }));
-        var show_length = $("<div>").appendTo(h);
-        var url = "";
-        addBtn("URLを生成", function(){
-            var array = [];
-            for(var k in query) {
-                var value = query[k].val();
-                if(value.length === 0) continue;
-                array.push([k, encode(value)]);
-            }
-            url = location.origin + location.pathname + '?' + array.map(function(v){
-                return v.join('=');
-            }).join('&');
-            $("<div>",{text: "URLの長さ:"+url.length}).appendTo(show_url.empty());
-            $("<a>",{text: url, href: url, target: "_blank"}).appendTo(show_url);
+    function appendCheckBox (parent, title, value, change) { // チェックボックスを追加
+        var flag = value;
+        var h = $("<span>").appendTo(parent);
+        var check = $("<input>",{type:"checkbox"});
+        function set (bool, isClick) {
+            flag = bool;
+            btn.css("background-color", flag ? "orange" : "gray");
+            check.prop("checked",flag);
+            if(change && isClick) change(flag);
+        };
+        var btn = $("<button>").appendTo(h)
+        .append(check).append(title).click(function(){
+            set(!flag);
         });
-        addBtn("コピー", function(){
-            var e = document.createElement("textarea");
-            e.textContent = url;
-            var body = document.getElementsByTagName("body")[0];
-            body.appendChild(e);
-            e.select();
-            document.execCommand('copy');
-            body.removeChild(e);
-        });
-        var show_url = $("<div>").appendTo(h);
-        function addInput(title, placeholder, textarea_flag){
-            return $(textarea_flag ? "<textarea>" : "<input>",{
-                placeholder: placeholder
-            }).appendTo($("<div>",{text: title + ':'}).appendTo(h));
+        set(flag);
+        return function () { return flag; } ;
+    };
+    function clear_console () {
+        clearAll_Interval();
+        result_js.empty();
+        g_line_counter = 0;
+    }
+    function run () {
+        clear_console();
+        var v = input_js.val();
+        try {
+            console.log(eval(v));
         }
-        function addBtn(title, func){
-            return $("<button>",{text:title}).click(func).appendTo(h);
+        catch (e) {
+            console.error(e);
         }
     }
-    //---------------------------------------------------------------------------------
+    //-------------------------------------------------------------------------------
+    var ui = {
+        js: ui_js,
+        html: ui_html
+    }
+    var input = {
+        js: input_js,
+        html: input_html
+    }
+    var array = ['js','html'];
+    array.forEach(function(v){
+        appendBtn(ui[v], "上に移動", function(){ input[v].stop().animate({scrollTop:input[v].scrollTop()-input[v].height()}) });
+        appendBtn(ui[v], "下に移動", function(){ input[v].stop().animate({scrollTop:input[v].scrollTop()+input[v].height()}) });
+    });
+    appendBtn(ui_js, "実行", run);
+    appendBtn(ui_js, "クリア", clear_console);
+    //-------------------------------------------------------
+    appendBtn(ui_html, "反映", function(){
+        result_html.html(input_html.val());
+    });
+    appendBtn(ui_html, "クリア", function(){
+        result_html.empty();
+    });
+    shapeCode = function () {
+        if(!flag_AutoShapeCode()) return;
+        var result = js_beautify(input_js.val(),{max_preserve_newlines:2});
+        input_js.val(result).focus().get(0);
+    }
+    var flag_AutoShapeCode = appendCheckBox(ui_js, "自動コード整形", false, shapeCode);
+    //-------------------------------------------------------------------------------
 })();

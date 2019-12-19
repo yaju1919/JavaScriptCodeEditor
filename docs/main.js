@@ -5,7 +5,7 @@
     //-------------------------------------------------------------------------------
     var clearAll_Interval;
     (function () { // setTimeout & setInterval
-        var setTimeout_copy = window.setInterval;
+        var setTimeout_copy = window.setTimeout;
         var setInterval_copy = window.setInterval;
         var set_IDs = [];
         clearAll_Interval = function () { // 時間差関数を消去

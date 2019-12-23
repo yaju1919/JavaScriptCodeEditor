@@ -1,13 +1,25 @@
-Content URL: https://yaju1919.github.io/edita/
-
-This content can be used as a sandbox for HTML and JavaScript.
-
+# https://yaju1919.github.io/edita/
+This application can be used as a sandbox for HTML and JavaScript.
 Also works in Internet Explorer.
 
---------------------------------------------------
+# Dependency
+Programming language used; JavaScript, HTML
 
-Library used
+# Demo
+Go https://yaju1919.github.io/edita/
+This application works even with Internet Explorer.
 
+# Usage
+Write the program on the input form and press "反映" or "実行" button.
+
+# License
+This software is released under the MIT License, see LICENSE.
+
+# Authors
+name: yaju1919
+email: yaju1919ixgy@gmail.com
+
+# References
 Shaping code: Done
 Reference URL: https://github.com/beautify-web/js-beautify
 

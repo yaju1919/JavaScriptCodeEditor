@@ -26,7 +26,7 @@
     var g_line_counter = 0; // consoleの行数
     (function () {
         function appendResult (text, back, font, symbol) {
-            $("<pre>").appendTo(result_js)
+            $("<div>").appendTo(result_js)
                 .css({
                 backgroundColor: back,
                 color: font

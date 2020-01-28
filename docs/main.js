@@ -46,9 +46,9 @@
             window.console[k] = (function(){
                 var key = k, back = ar[0], font = ar[1], symbol = ar[2];
                 return function(){
-                    origin[key](arguments);
-                    var str = yaju1919.makeArray(arguments.length).map(function(i){
-                        var x = arguments[i];
+                    var arg = yaju1919.makeArray(arguments.length).map(function(i){ return arguments[i] });
+                    origin[key].apply(null, arg);
+                    var str = arg.map(function(x){
                         if(yaju1919.judgeType(x,"Object")){
                             return '{' + Object.keys(x).map(function(k){
                                 return k + ':' + String(x[k])

@@ -39,19 +39,24 @@
             info: [ "lightblue", "blue", "●" ],
         }
         var origin = {};
+        if(!window.console) window.console = {};
         for(var k in list){
-            origin[k] = window.console[k];
+            origin[k] = window.console[k] || function(){};
             var ar = list[k];
             window.console[k] = (function(){
                 var key = k, back = ar[0], font = ar[1], symbol = ar[2];
                 return function(){
                     origin[key](arguments);
-                    var str = "";
-                    if(arguments.length === 1) {
-                        var type = Object.prototype.toString.call(arguments[0]);
-                        if(["Number", "String", "Array", "Boolean", "Error"].indexOf(type.replace(/\[object |\]/g,"")) === -1) str = type;
-                    }
-                    if(!str) str = Array.prototype.join.call(arguments);
+                    var str = yaju1919.makeArray(arguments.length).map(function(i){
+                        var x = arguments[i];
+                        if(yaju1919.judgeType(x,"Object")){
+                            return '{' + Object.keys(x).map(function(k){
+                                return k + ':' + String(x[k])
+                            }).join(',') + '}';
+                        }
+                        else if(yaju1919.judgeType(arguments[0],["Number", "String", "Array", "Boolean", "Error"])) return yaju1919.getType(x);
+                        return x;
+                    }).join(', ');
                     appendResult(str, back, font, symbol);
                 }
             })();

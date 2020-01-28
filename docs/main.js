@@ -54,8 +54,8 @@
                                 return k + ':' + String(x[k])
                             }).join(',') + '}';
                         }
-                        else if(yaju1919.judgeType(arguments[0],["Number", "String", "Array", "Boolean", "Error"])) return yaju1919.getType(x);
-                        return x;
+                        else if(!yaju1919.judgeType(x,["Number", "String", "Array", "Boolean", "Error"])) return yaju1919.getType(x);
+                        return String(x);
                     }).join(', ');
                     appendResult(str, back, font, symbol);
                 }

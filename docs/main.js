@@ -48,14 +48,17 @@
                 return function(){
                     var thisArg = arguments;
                     origin[key].apply(console, thisArg);
-                    var str = yaju1919.makeArray(thisArg.length - 1).map(function(i){
+                    var str = yaju1919.makeArray(thisArg.length).map(function(i){
                         var x = thisArg[i];
                         if(yaju1919.judgeType(x,"Object")){
                             return '{' + Object.keys(x).map(function(k){
                                 return k + ':' + String(x[k])
                             }).join(',') + '}';
                         }
-                        else if(!yaju1919.judgeType(x,["Number", "String", "Array", "Boolean", "Error"])) return yaju1919.getType(x);
+                        else if(yaju1919.judgeType(x,"Array")){
+                            return '[' + String(x) + ']';
+                        }
+                        else if(!yaju1919.judgeType(x,["Number", "String", "RegExp", "Boolean", "Error"])) return yaju1919.getType(x);
                         return String(x);
                     }).join(', ');
                     appendResult(str, back, font, symbol);

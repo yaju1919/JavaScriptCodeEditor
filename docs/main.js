@@ -70,8 +70,8 @@
         padding : "1em",
     });
     $("<h1>",{text:"HTML & JavaScript エディタ"}).appendTo(h);
-    var h_html = $("<div>").appendTo(h);
-    var h_js = $("<div>").appendTo(h);
+    var h_html = $("<div>").attr('id','h_html').appendTo(h);
+    var h_js = $("<div>").attr('id','h_js').appendTo(h);
     function resize(){
         var w = $(window).width(),
             h = $(window).height();
@@ -91,14 +91,15 @@
     var ui_js = $("<div>").appendTo(h_js);
     //-------------------------------------------------------
     var input_html = yaju1919.addInputText(h_html,{
+        id: "html",
         textarea: true,
         placeholder: "HTMLを入力",
         save: "html",
     });
     var shapeCode = function(){};
     var input_js = yaju1919.addInputText(h_html,{
-        textarea: true,
         id: "js",
+        textarea: true,
         placeholder: "JavaScriptを入力",
         save: "js",
     });
@@ -126,7 +127,7 @@
     }
     function run () {
         clear_console();
-        var v = input_js.val();
+        var v = input_js();
         try {
             console.log(eval(v));
         }
@@ -135,16 +136,9 @@
         }
     }
     //-------------------------------------------------------------------------------
-    var ui = {
-        js: ui_js,
-        html: ui_html
-    }
-    var input = {
-        js: input_js,
-        html: input_html
-    }
-    var array = ['js','html'];
-    array.forEach(function(v){
+    ['js','html'].forEach(function(v){
+        var input = $('#' + v),
+            ui = $('#h_' + v);
         addBtn(ui[v], "上に移動", function(){ input[v].stop().animate({scrollTop:input[v].scrollTop()-input[v].height()}) });
         addBtn(ui[v], "下に移動", function(){ input[v].stop().animate({scrollTop:input[v].scrollTop()+input[v].height()}) });
     });
@@ -152,7 +146,7 @@
     addBtn(ui_js, "クリア", clear_console);
     //-------------------------------------------------------
     addBtn(ui_html, "反映", function(){
-        result_html.html(input_html.val());
+        result_html.html(input_html());
     });
     addBtn(ui_html, "クリア", function(){
         result_html.empty();
@@ -160,8 +154,8 @@
     shapeCode = function () {
         if(!start_flag) return;
         if(!flag_AutoShapeCode()) return;
-        var result = js_beautify(input_js.val(),{max_preserve_newlines:2});
-        input_js.val(result).focus().get(0);
+        var result = js_beautify(input_js(),{max_preserve_newlines:2});
+        $("#js").val(result).focus().get(0);
     }
     var flag_AutoShapeCode = yaju1919.addInputBool(ui_js,{
         title: "自動コード整形",

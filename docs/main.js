@@ -146,7 +146,7 @@
         clear_console();
         var v = input_js();
         try {
-            console.log(eval(v));
+            console.log((0, eval)(v));
         }
         catch (e) {
             console.error(e);

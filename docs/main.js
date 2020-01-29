@@ -25,11 +25,23 @@
     var g_line_counter = 0; // consoleの行数
     (function () {
         function appendResult (text, back, font, symbol) {
-            $("<div>").appendTo(result_js)
-                .css({
+            var line = $("<div>").css({
                 backgroundColor: back,
-                color: font
-            }).text('　' + (symbol || g_line_counter++) + '　-　' + text);
+                color: font,
+                "text-align": "left",
+                maxWidth: "100%",
+            }).appendTo(result_js);
+            var color = yaju1919.getCSS(line).backgroundColor.match(/[0-9]+/g).map(function(n){
+                return Number(n) - 30;
+            });
+            $("<div>").text(symbol || g_line_counter++).css({
+                backgroundColor: "rgb(" + color + ")",
+                width: "3em"
+            }).appendTo(line);
+            $("<div>").text(text).appendTo(line);
+            line.find("div").css({
+                display: "inline-block"
+            });
         }
         var list = { // [ back-color, font-color, symbol, func ]
             log: [ "white", "black", "" ],
@@ -70,27 +82,25 @@
         padding : "1em",
     });
     $("<h1>",{text:"HTML & JavaScript エディタ"}).appendTo(h);
-    var h_html = $("<div>").attr('id','h_html').appendTo(h);
-    var h_js = $("<div>").attr('id','h_js').appendTo(h);
+    var h_html = $("<div>").appendTo(h);
+    var h_js = $("<div>").appendTo(h);
     function resize(){
         var w = $(window).width(),
             h = $(window).height();
         if(w > h) { // PC
             h_html.css({float: "left", width: "50%"});
             h_js.css({float: "right", width: "50%"});
-            $("textarea").width("50%");
         }
         else {
             h_html.css({float: "none", width: "100%"});
             h_js.css({float: "none", width: "100%"});
-            $("textarea").width("100%");
         }
     }
     $(window).resize(resize);
     resize();
     //-------------------------------------------------------
-    var ui_html = $("<div>").appendTo(h_html);
-    var ui_js = $("<div>").appendTo(h_js);
+    var ui_html = $("<div>").appendTo(h_html).attr('id','ui_html');
+    var ui_js = $("<div>").appendTo(h_js).attr('id','ui_js');
     //-------------------------------------------------------
     var input_html = yaju1919.addInputText(h_html,{
         id: "html",
@@ -140,7 +150,7 @@
     //-------------------------------------------------------------------------------
     ['js','html'].forEach(function(v){
         var input = $('#' + v),
-            ui = $('#h_' + v);
+            ui = $('#ui_' + v);
         addBtn(ui, "上に移動", function(){ input[v].stop().animate({scrollTop:input[v].scrollTop()-input[v].height()}) });
         addBtn(ui, "下に移動", function(){ input[v].stop().animate({scrollTop:input[v].scrollTop()+input[v].height()}) });
     });

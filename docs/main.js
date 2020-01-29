@@ -158,7 +158,8 @@
         result_html.empty();
     });
     shapeCode = function () {
-        if(start_flag || !flag_AutoShapeCode()) return;
+        if(!start_flag) return;
+        if(!flag_AutoShapeCode()) return;
         var result = js_beautify(input_js.val(),{max_preserve_newlines:2});
         input_js.val(result).focus().get(0);
     }

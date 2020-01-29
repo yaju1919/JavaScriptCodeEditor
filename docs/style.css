@@ -6,8 +6,8 @@ textarea{
     overflow-y: scroll;
 }
 button {
-    /* 文字サイズを1.4emに指定 */
-    font-size: 1.4em;
+    /* 文字サイズを1.2emに指定 */
+    font-size: 1.2em;
 
     /* 文字の太さをboldに指定 */
     font-weight: bold;
@@ -16,8 +16,8 @@ button {
      * 横方向に30pxの余白を指定 */
     padding: 10px 30px;
 
-    /* 文字色を白色に指定 */
-    color: #fff;
+    /* 文字色を青色に指定 */
+    color: #00f;
 
     /* ボーダーをなくす */
     border-style: none;
@@ -38,10 +38,6 @@ button {
      * ぼかしを2px
      * 色を#000（黒）に指定 */
     text-shadow: 1px 1px 2px #000;
-
-    /* グラデーションの指定 */
-    background: -moz-linear-gradient(bottom, #36d, #248 50%, #36d);
-    background: -webkit-gradient(linear, left bottom, left top, from(#36d), color-stop(0.5, #248), to(#36d));
 
     /* 角丸の指定 */
     -moz-border-radius: 5px;

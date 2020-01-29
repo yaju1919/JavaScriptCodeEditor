@@ -78,10 +78,12 @@
         if(w > h) { // PC
             h_html.css({float: "left", width: "50%"});
             h_js.css({float: "right", width: "50%"});
+            $("textarea").width("50%");
         }
         else {
             h_html.css({float: "none", width: "100%"});
             h_js.css({float: "none", width: "100%"});
+            $("textarea").width("100%");
         }
     }
     $(window).resize(resize);
@@ -97,7 +99,7 @@
         save: "html",
     });
     var shapeCode = function(){};
-    var input_js = yaju1919.addInputText(h_html,{
+    var input_js = yaju1919.addInputText(h_js,{
         id: "js",
         textarea: true,
         placeholder: "JavaScriptを入力",

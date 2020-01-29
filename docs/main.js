@@ -91,22 +91,19 @@
     var ui_js = $("<div>").appendTo(h_js);
     //-------------------------------------------------------
     var input_html = yaju1919.addInputText(h_html,{
+        textarea: true,
         placeholder: "HTMLを入力",
         save: "html",
     });
     var shapeCode = function(){};
     var input_js = yaju1919.addInputText(h_html,{
+        textarea: true,
         id: "js",
         placeholder: "JavaScriptを入力",
         save: "js",
     });
     $("#js").keyup(function(e){
         if('}];'.indexOf(e.key) !== -1) shapeCode();
-    });
-    $("textarea").css({
-        padding : "1em",
-        boxSizing : 'border-box',
-        "overflow-y": "scroll",
     });
     //-------------------------------------------------------
     var result_html = $("<div>").appendTo(h_html);

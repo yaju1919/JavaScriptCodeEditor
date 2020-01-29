@@ -1,7 +1,5 @@
 (function () {
     'use strict';
-    var FONT_COLOR = "lightgreen";
-    var BACK_COLOR = "black";
     //-------------------------------------------------------------------------------
     var clearAll_Interval;
     (function () { // setTimeout & setInterval
@@ -71,25 +69,43 @@
         padding : "1em",
     });
     $("<h1>",{text:"HTML & JavaScript エディタ"}).appendTo(h);
-    var h_html = $("<div>").appendTo(h).css({float: "left", width: "50%"});
-    var h_js = $("<div>").appendTo(h).css({float: "right", width: "50%"});
+    var h_html = $("<div>").appendTo(h);
+    var h_js = $("<div>").appendTo(h);
+    function resize(){
+        var w = $(window).width(),
+            h = $(window).height();
+        if(w > h) { // PC
+            h_html.css({float: "left", width: "50%"});
+            h_js.css({float: "right", width: "50%"});
+        }
+        else {
+            h_html.css({float: "none", width: "100%"});
+            h_js.css({float: "none", width: "100%"});
+        }
+    }
+    $(window).resize(resize);
+    resize();
     //-------------------------------------------------------
     var ui_html = $("<div>").appendTo(h_html);
     var ui_js = $("<div>").appendTo(h_js);
     //-------------------------------------------------------
-    var input_html = $("<textarea>",{placeholder: "HTMLを入力"}).appendTo(h_html);
+    var input_html = yaju1919.addInputText(h_html,{
+        placeholder: "HTMLを入力",
+        save: "html",
+    });
     var shapeCode = function(){};
-    var input_js = $("<textarea>",{placeholder: "JavaScriptを入力"}).appendTo(h_js).keyup(function(e){
-        if(['}',']',';'].indexOf(e.key) !== -1) shapeCode();
+    var input_js = yaju1919.addInputText(h_html,{
+        id: "js",
+        placeholder: "JavaScriptを入力",
+        save: "js",
+    });
+    $("#js").keyup(function(e){
+        if('}];'.indexOf(e.key) !== -1) shapeCode();
     });
     $("textarea").css({
-        width: "90%",
-        height: $(window).height()/3,
         padding : "1em",
         boxSizing : 'border-box',
         "overflow-y": "scroll",
-        backgroundColor: BACK_COLOR,
-        color: FONT_COLOR
     });
     //-------------------------------------------------------
     var result_html = $("<div>").appendTo(h_html);
@@ -102,26 +118,9 @@
         "overflow-y": "scroll",
     });
     //-------------------------------------------------------------------------------
-    function appendBtn (parent, title, func) {
-        return $("<button>").text(title).click(func).appendTo(parent);
+    function addBtn (parentNode, title, func) {
+        return $("<button>").text(title).click(func).appendTo(parentNode);
     }
-    function appendCheckBox (parent, title, value, change) { // チェックボックスを追加
-        var flag = value;
-        var h = $("<span>").appendTo(parent);
-        var check = $("<input>",{type:"checkbox"});
-        function set (bool, isClick) {
-            flag = bool;
-            btn.css("background-color", flag ? "orange" : "gray");
-            check.prop("checked",flag);
-            if(change && isClick) change(flag);
-        };
-        var btn = $("<button>").appendTo(h)
-        .append(check).append(title).click(function(){
-            set(!flag);
-        });
-        set(flag);
-        return function () { return flag; } ;
-    };
     function clear_console () {
         clearAll_Interval();
         result_js.empty();
@@ -148,16 +147,16 @@
     }
     var array = ['js','html'];
     array.forEach(function(v){
-        appendBtn(ui[v], "上に移動", function(){ input[v].stop().animate({scrollTop:input[v].scrollTop()-input[v].height()}) });
-        appendBtn(ui[v], "下に移動", function(){ input[v].stop().animate({scrollTop:input[v].scrollTop()+input[v].height()}) });
+        addBtn(ui[v], "上に移動", function(){ input[v].stop().animate({scrollTop:input[v].scrollTop()-input[v].height()}) });
+        addBtn(ui[v], "下に移動", function(){ input[v].stop().animate({scrollTop:input[v].scrollTop()+input[v].height()}) });
     });
-    appendBtn(ui_js, "実行", run);
-    appendBtn(ui_js, "クリア", clear_console);
+    addBtn(ui_js, "実行", run);
+    addBtn(ui_js, "クリア", clear_console);
     //-------------------------------------------------------
-    appendBtn(ui_html, "反映", function(){
+    addBtn(ui_html, "反映", function(){
         result_html.html(input_html.val());
     });
-    appendBtn(ui_html, "クリア", function(){
+    addBtn(ui_html, "クリア", function(){
         result_html.empty();
     });
     shapeCode = function () {
@@ -165,6 +164,9 @@
         var result = js_beautify(input_js.val(),{max_preserve_newlines:2});
         input_js.val(result).focus().get(0);
     }
-    var flag_AutoShapeCode = appendCheckBox(ui_js, "自動コード整形", false, shapeCode);
+    var flag_AutoShapeCode = yaju1919.addInputBool(ui_js,{
+        title: "自動コード整形",
+        change: shapeCode,
+    });
     //-------------------------------------------------------------------------------
 })();

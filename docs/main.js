@@ -109,14 +109,14 @@
     var input_html = yaju1919.addInputText(h_html,{
         id: "html",
         textarea: true,
-        placeholder: "HTMLを入力",
+        placeholder: "HTMLをここに入力",
         save: "html",
     });
     var shapeCode = function(){};
     var input_js = yaju1919.addInputText(h_js,{
         id: "js",
         textarea: true,
-        placeholder: "JavaScriptを入力",
+        placeholder: "JavaScriptをここに入力",
         save: "js",
     });
     $("#js").keyup(function(e){
@@ -130,7 +130,7 @@
         "max-height": $(window).height()/3,
         padding : "1em",
         boxSizing : 'border-box',
-        "overflow-y": "scroll",
+        overflow: "visible scroll"
     });
     //-------------------------------------------------------------------------------
     function addBtn (parentNode, title, func) {

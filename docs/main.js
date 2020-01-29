@@ -139,8 +139,8 @@
     ['js','html'].forEach(function(v){
         var input = $('#' + v),
             ui = $('#h_' + v);
-        addBtn(ui[v], "上に移動", function(){ input[v].stop().animate({scrollTop:input[v].scrollTop()-input[v].height()}) });
-        addBtn(ui[v], "下に移動", function(){ input[v].stop().animate({scrollTop:input[v].scrollTop()+input[v].height()}) });
+        addBtn(ui, "上に移動", function(){ input[v].stop().animate({scrollTop:input[v].scrollTop()-input[v].height()}) });
+        addBtn(ui, "下に移動", function(){ input[v].stop().animate({scrollTop:input[v].scrollTop()+input[v].height()}) });
     });
     addBtn(ui_js, "実行", run);
     addBtn(ui_js, "クリア", clear_console);

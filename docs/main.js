@@ -1,5 +1,6 @@
 (function () {
     'use strict';
+    var start_flag = false;
     //-------------------------------------------------------------------------------
     var clearAll_Interval;
     (function () { // setTimeout & setInterval
@@ -160,7 +161,7 @@
         result_html.empty();
     });
     shapeCode = function () {
-        if(!flag_AutoShapeCode()) return;
+        if(start_flag || !flag_AutoShapeCode()) return;
         var result = js_beautify(input_js.val(),{max_preserve_newlines:2});
         input_js.val(result).focus().get(0);
     }
@@ -168,5 +169,6 @@
         title: "自動コード整形",
         change: shapeCode,
     });
+    start_flag = true;
     //-------------------------------------------------------------------------------
 })();

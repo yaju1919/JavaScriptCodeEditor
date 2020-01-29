@@ -31,14 +31,17 @@
                 "text-align": "left",
                 maxWidth: "100%",
             }).appendTo(result_js);
-            var color = yaju1919.getCSS(line).backgroundColor.match(/[0-9]+/g).map(function(n){
-                return Number(n) - 30;
+            var color = yaju1919.getCSS(line).backgroundColor.match(/[0-9]+/g).map(function(n,i){
+                return Number(n) - i*10;
             });
             $("<div>").text(symbol || g_line_counter++).css({
                 backgroundColor: "rgb(" + color + ")",
-                width: "3em"
+                width: "3em",
+                "text-align": "center",
             }).appendTo(line);
-            $("<div>").text(text).appendTo(line);
+            $("<div>").text(text).appendTo(line).css({
+                "margin-left": "1em"
+            });
             line.find("div").css({
                 display: "inline-block"
             });

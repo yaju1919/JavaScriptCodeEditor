@@ -31,8 +31,10 @@
                 "text-align": "left",
                 maxWidth: "100%",
             }).appendTo(result_js);
-            var color = yaju1919.getCSS(line).backgroundColor.match(/[0-9]+/g).map(function(n,i){
-                return Number(n) - i*10;
+            var color = yaju1919.getCSS(line).backgroundColor.match(/[0-9]+/g).map(function(v,i){
+                var n = Number(v);
+                var d = (n - n*0.1);
+                return d >= 0 ? d : 0;
             });
             $("<div>").text(symbol || g_line_counter++).css({
                 backgroundColor: "rgb(" + color + ")",
@@ -88,9 +90,8 @@
     var h_html = $("<div>").appendTo(h);
     var h_js = $("<div>").appendTo(h);
     function resize(){
-        var w = $(window).width(),
-            h = $(window).height();
-        if(w > h) { // PC
+        var w = $(window).width();
+        if(w < 500) {
             h_html.css({float: "left", width: "50%"});
             h_js.css({float: "right", width: "50%"});
         }

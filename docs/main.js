@@ -111,14 +111,14 @@
         id: "html",
         textarea: true,
         placeholder: "HTMLを入力" + yaju1919.repeat(' ',100),
-        save: "html",
+        //save: "html",
     });
     var shapeCode = function(){};
     var input_js = yaju1919.addInputText(h_js,{
         id: "js",
         textarea: true,
         placeholder: "JavaScriptを入力" + yaju1919.repeat(' ',100),
-        save: "js",
+        //save: "js",
     });
     $("#js").keyup(function(e){
         if('}];'.indexOf(e.key) !== -1) shapeCode();

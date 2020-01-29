@@ -85,6 +85,7 @@
     //-------------------------------------------------------------------------------
     var h = $("<div>").appendTo($("body")).css({
         padding : "1em",
+        "text-align": "center",
     });
     $("<h1>",{text:"HTML & JavaScript エディタ"}).appendTo(h);
     var h_html = $("<div>").appendTo(h);

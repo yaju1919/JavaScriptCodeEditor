@@ -91,7 +91,7 @@
     var h_js = $("<div>").appendTo(h);
     function resize(){
         var w = $(window).width();
-        if(w < 500) {
+        if(w > 500) {
             h_html.css({float: "left", width: "50%"});
             h_js.css({float: "right", width: "50%"});
         }
@@ -103,8 +103,8 @@
     $(window).resize(resize);
     resize();
     //-------------------------------------------------------
-    var ui_html = $("<div>").appendTo(h_html).attr('id','ui_html');
-    var ui_js = $("<div>").appendTo(h_js).attr('id','ui_js');
+    var ui_html = $("<div>").appendTo(h_html);
+    var ui_js = $("<div>").appendTo(h_js);
     //-------------------------------------------------------
     var input_html = yaju1919.addInputText(h_html,{
         id: "html",
@@ -151,17 +151,11 @@
             console.error(e);
         }
     }
-    //-------------------------------------------------------------------------------
-    ['js','html'].forEach(function(v){
-        var input = $('#' + v),
-            ui = $('#ui_' + v);
-        addBtn(ui, "上に移動", function(){ input[v].stop().animate({scrollTop:input[v].scrollTop()-input[v].height()}) });
-        addBtn(ui, "下に移動", function(){ input[v].stop().animate({scrollTop:input[v].scrollTop()+input[v].height()}) });
-    });
-    addBtn(ui_js, "実行", run);
+    //------------------------------------------------------------------------------
+    addBtn(ui_js, "JSを実行", run);
     addBtn(ui_js, "クリア", clear_console);
     //-------------------------------------------------------
-    addBtn(ui_html, "反映", function(){
+    addBtn(ui_html, "HTMLを反映", function(){
         result_html.html(input_html());
     });
     addBtn(ui_html, "クリア", function(){
@@ -176,6 +170,7 @@
     var flag_AutoShapeCode = yaju1919.addInputBool(ui_js,{
         title: "自動コード整形",
         change: shapeCode,
+        save: "shapeCode"
     });
     start_flag = true;
     //-------------------------------------------------------------------------------

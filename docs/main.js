@@ -171,7 +171,7 @@
     var flag_AutoShapeCode = yaju1919.addInputBool(ui_js,{
         title: "自動コード整形",
         change: shapeCode,
-        save: "shapeCode"
+        //save: "shapeCode"
     });
     start_flag = true;
     //-------------------------------------------------------------------------------

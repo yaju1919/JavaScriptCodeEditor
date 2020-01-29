@@ -16,8 +16,11 @@ button {
      * 横方向に30pxの余白を指定 */
     padding: 10px 30px;
 
-    /* 文字色を青色に指定 */
-    color: #00f;
+    /* 文字色を白色に指定 */
+    color: #000;
+    
+    /* 背景色を濃い青に指定 */
+    background-color: #248;
 
     /* ボーダーをなくす */
     border-style: none;

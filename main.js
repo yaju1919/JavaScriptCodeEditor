@@ -120,6 +120,13 @@
         placeholder: "JavaScriptを入力" + yaju1919.repeat(' ',100),
         save: "js",
     });
+    $("#html").add("#js").css({
+        "background-color": "black",
+        "color": "lightgreen",
+        "padding": "1em",
+        "boxSizing": "border-box",
+        "overflow-y": "scroll",
+    });
     $("#js").keyup(function(e){
         if('}];'.indexOf(e.key) !== -1) shapeCode();
     });
